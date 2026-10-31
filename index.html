@@ -11,19 +11,18 @@
         
         <!-- Intestazione -->
         <header class="mb-6 text-center">
-            <h1 class="text-3xl font-extrabold text-gray-800">🏠 HOME</h1>
-            <p class="text-sm text-gray-500 mt-1">Ti aiuto a gestire la casa!</p>
+            <h1 class="text-3xl font-extrabold text-gray-800">🏠 Home Tracker</h1>
+            <p class="text-sm text-gray-500 mt-1">Gestisci pulizie e manutenzioni per ogni ambiente</p>
         </header>
 
         <!-- Form per aggiungere un'attività -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
             <h2 class="text-lg font-bold text-gray-700 mb-3">Nuova attività</h2>
             <form id="task-form" class="space-y-3">
-                <input type="text" id="task-name" placeholder="Nome attività (es. Cambio filtri, Spolverare)" required 
-                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                
-                <div class="flex gap-2">
-                    <select id="task-room" class="flex-1 border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Selezione Stanza -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Seleziona Ambiente</label>
+                    <select id="task-room" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="🛏️ Camera da letto">🛏️ Camera da letto</option>
                         <option value="🖥️ Studio">🖥️ Studio</option>
                         <option value="🍳 Cucina">🍳 Cucina</option>
@@ -35,115 +34,16 @@
                         <option value="🌿 Terrazza piccola">🌿 Terrazza piccola</option>
                         <option value="🏡 Altro / Generale">🏡 Altro / Generale</option>
                     </select>
-                    
-                    <button type="submit" class="bg-blue-600 text-white font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-blue-700 transition shadow-sm">
-                        Aggiungi
-                    </button>
                 </div>
-            </form>
-        </div>
 
-        <!-- Lista delle attività raggruppate per ambiente -->
-        <div id="task-list" class="space-y-6">
-            <!-- Verrà popolato da JavaScript -->
-        </div>
-    </div>
+                <!-- Selezione Attività Predefinita -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Seleziona Attività</label>
+                    <select id="task-template" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <!-- Verrà popolato dinamicamente in base alla stanza -->
+                    </select>
+                </div>
 
-    <script>
-        let tasks = JSON.parse(localStorage.getItem('home_tasks_rooms')) || [];
-
-        const form = document.getElementById('task-form');
-        const taskNameInput = document.getElementById('task-name');
-        const taskRoomSelect = document.getElementById('task-room');
-        const taskList = document.getElementById('task-list');
-
-        function saveAndRender() {
-            localStorage.setItem('home_tasks_rooms', JSON.stringify(tasks));
-            renderTasks();
-        }
-
-        function renderTasks() {
-            taskList.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                taskList.innerHTML = `
-                    <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 p-6">
-                        <p class="text-gray-400 text-sm">Nessuna attività registrata. Inizia aggiungendone una qui sopra! 👆</p>
-                    </div>`;
-                return;
-            }
-
-            // Raggruppa le attività per ambiente
-            const grouped = tasks.reduce((acc, task, index) => {
-                const room = task.room || '🏡 Altro / Generale';
-                if (!acc[room]) acc[room] = [];
-                acc[room].push({ ...task, originalIndex: index });
-                return acc;
-            }, {});
-
-            // Crea le sezioni per ogni stanza
-            for (const [room, roomTasks] of Object.entries(grouped)) {
-                const roomContainer = document.createElement('div');
-                roomContainer.className = 'bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden';
-
-                let tasksHTML = '';
-                roomTasks.forEach(task => {
-                    const lastDate = task.lastDone ? new Date(task.lastDone).toLocaleDateString('it-IT') : 'Mai fatta';
-                    
-                    tasksHTML += `
-                        <div class="flex items-center justify-between p-4 border-b border-gray-100 last:border-none hover:bg-gray-50/50 transition">
-                            <div>
-                                <h4 class="font-semibold text-gray-800 text-sm sm:text-base">${task.name}</h4>
-                                <p class="text-xs text-gray-400 mt-0.5">Ultima volta: <span class="font-medium text-gray-600">${lastDate}</span></p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="completeTask(${task.originalIndex})" class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition">
-                                    ✓ Fatto oggi
-                                </button>
-                                <button onclick="deleteTask(${task.originalIndex})" class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg transition" title="Elimina">
-                                    ✕
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                roomContainer.innerHTML = `
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="font-bold text-gray-700 text-sm tracking-wide uppercase">${room}</h3>
-                        <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-medium">${roomTasks.length}</span>
-                    </div>
-                    <div>${tasksHTML}</div>
-                `;
-
-                taskList.appendChild(roomContainer);
-            }
-        }
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            tasks.push({
-                name: taskNameInput.value.trim(),
-                room: taskRoomSelect.value,
-                lastDone: null
-            });
-            taskNameInput.value = '';
-            saveAndRender();
-        });
-
-        window.completeTask = function(index) {
-            tasks[index].lastDone = new Date().toISOString();
-            saveAndRender();
-        }
-
-        window.deleteTask = function(index) {
-            if (confirm('Vuoi davvero eliminare questa attività?')) {
-                tasks.splice(index, 1);
-                saveAndRender();
-            }
-        }
-
-        renderTasks();
-    </script>
-</body>
-</html>
+                <!-- Campo personalizzato (appare se selezioni "Altro...") -->
+                <div id="custom-task-container" class="hidden">
+                    <label class="block text-xs font-semibold
