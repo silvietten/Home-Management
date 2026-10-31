@@ -1,8 +1,8 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-A    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HOME - Gestione Casa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -33,19 +33,18 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <div class="max-w-xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
         
-        <!-- Form per aggiungere un'attività -->
-        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 mb-8">
+        <!-- Form per registrare un'attività -->
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 mb-6">
             <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2.5">
                 <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Registra Attività Svolta
             </h2>
             
             <form id="task-form" class="space-y-4">
-                <!-- Selezione Stanza / Ambiente (Dimensioni Ripristinate) -->
+                <!-- Selezione Stanza / Ambiente -->
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ambiente</label>
                     <select id="task-room" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                         <option value="">-- Seleziona Ambiente --</option>
-                        
                         <option value="🛏️ Camera matrimoniale">🛏️ Camera matrimoniale</option>
                         <option value="🖥️ Studio">🖥️ Studio</option>
                         <option value="🍳 Cucina">🍳 Cucina</option>
@@ -54,12 +53,13 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <option value="🛁 Bagno grande">🛁 Bagno grande</option>
                         <option value="🧼 Bagno ospiti">🧼 Bagno ospiti</option>
                         <option value="🪴 Terrazza grande">🪴 Terrazza grande</option>
-                        <option value="🌿 Terrazzino cucina">🌿 Terrazzino</option>
-                                                <option value="🚗 Garage">🚗 Garage</option>
+                        <option value="🌿 Terrazzino">🌿 Terrazzino</option>
+                        <option value="📦 Ripostiglio / Lavanderia">📦 Ripostiglio / Lavanderia</option>
+                        <option value="🚗 Garage">🚗 Garage</option>
                     </select>
                 </div>
 
-                <!-- Menu a tendina secondario (Dimensioni Ripristinate) -->
+                <!-- Menu a tendina secondario per le attività -->
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Attività Svolta</label>
                     <select id="task-action" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition disabled:opacity-50" disabled>
@@ -67,7 +67,7 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     </select>
                 </div>
 
-                <!-- Campo libero facoltativo (Dimensioni Ripristinate) -->
+                <!-- Campo note opzionale -->
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Note aggiuntive (Opzionale)</label>
                     <input type="text" id="task-notes" placeholder="Es. Usato prodotto anticalcare nuovo" 
@@ -81,17 +81,37 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
             </form>
         </div>
 
-        <!-- Registro delle attività svolte -->
-        <div class="space-y-4">
-            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">Storico Attività Svolte</h2>
-            <div id="task-list" class="space-y-3">
-                <!-- Vengono inserite qui dinamicamente -->
+        <!-- BOTTONE PER APRIRE LO STORICO NASCOSTO -->
+        <button onclick="toggleHistoryModal()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-2xl shadow-md border border-slate-200 flex items-center justify-between transition">
+            <span class="flex items-center gap-2">
+                📜 <span>Consultare lo Storico</span>
+            </span>
+            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full" id="history-counter-badge">0 voci</span>
+        </button>
+
+    </div>
+
+    <!-- PANNELLO MODALE STORICO (COMPLETAMENTE NASCOSTO DI DEFAULT) -->
+    <div id="history-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden border border-slate-100">
+            <!-- Header Modale -->
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    📜 Storico Attività per Stanza
+                </h3>
+                <button onclick="toggleHistoryModal()" class="w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Contenuto dello Storico con le stanze -->
+            <div id="room-history-container" class="p-6 overflow-y-auto space-y-3 flex-1">
+                <!-- Inserito dinamicamente -->
             </div>
         </div>
     </div>
 
     <script>
-        // Mappatura delle attività per ciascun ambiente
         const roomActivities = {
             "🛏️ Camera matrimoniale": [
                 "Cambio lenzuola",
@@ -166,11 +186,12 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
         const actionSelect = document.getElementById('task-action');
         const notesInput = document.getElementById('task-notes');
         const taskForm = document.getElementById('task-form');
-        const taskList = document.getElementById('task-list');
+        const historyContainer = document.getElementById('room-history-container');
+        const historyModal = document.getElementById('history-modal');
+        const historyCounterBadge = document.getElementById('history-counter-badge');
 
-        let tasks = JSON.parse(localStorage.getItem('home_history')) || [];
+        let tasks = JSON.parse(localStorage.getItem('home_history_v4')) || [];
 
-        // Cambia le opzioni del secondo menu a tendina in base alla stanza scelta
         roomSelect.addEventListener('change', () => {
             const selectedRoom = roomSelect.value;
             actionSelect.innerHTML = '';
@@ -197,57 +218,112 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
             }
         });
 
-        // Formattazione data corrente + ora
         function getCurrentFormattedDate() {
             const now = new Date();
-            const dateStr = now.toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            const timeStr = now.toLocaleTimeString('it-IT', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            const dateStr = now.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
             return `${dateStr} alle ${timeStr}`;
         }
 
-        // Renderizza la lista dello storico
-        function renderTasks() {
-            taskList.innerHTML = '';
-            
+        function toggleHistoryModal() {
+            historyModal.classList.toggle('hidden');
+        }
+
+        function renderHistory() {
+            historyContainer.innerHTML = '';
+            historyCounterBadge.textContent = `${tasks.length} voci`;
+
             if (tasks.length === 0) {
-                taskList.innerHTML = `
-                    <div class="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
+                historyContainer.innerHTML = `
+                    <div class="text-center py-8">
                         <p class="text-slate-400 text-sm">Nessuna attività registrata nello storico.</p>
                     </div>`;
                 return;
             }
 
-            tasks.forEach((task, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between transition hover:shadow-md';
-                
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                ${task.room}
-                            </span>
-                            <span class="text-xs text-slate-400">📅 ${task.timestamp}</span>
+            // Raggruppa per Stanza -> poi per Attività
+            const grouped = {};
+            tasks.forEach(item => {
+                if (!grouped[item.room]) grouped[item.room] = {};
+                if (!grouped[item.room][item.action]) grouped[item.room][item.action] = [];
+                grouped[item.room][item.action].push(item);
+            });
+
+            Object.keys(grouped).forEach((room, roomIdx) => {
+                const roomData = grouped[room];
+                const totalRoomLogs = Object.values(roomData).reduce((acc, curr) => acc + curr.length, 0);
+
+                const roomCard = document.createElement('div');
+                roomCard.className = 'bg-slate-50/80 rounded-2xl border border-slate-200/80 overflow-hidden';
+
+                let activitiesHTML = '';
+                Object.keys(roomData).forEach((action, actIdx) => {
+                    const logs = roomData[action];
+                    
+                    let logsHTML = '';
+                    logs.forEach(log => {
+                        logsHTML += `
+                            <div class="flex items-center justify-between text-xs py-2 border-b border-slate-100 last:border-0 pl-3">
+                                <div>
+                                    <span class="font-medium text-slate-700">📅 ${log.timestamp}</span>
+                                    ${log.notes ? `<p class="text-slate-400 italic mt-0.5">"${log.notes}"</p>` : ''}
+                                </div>
+                                <button onclick="deleteSingleLog('${log.id}')" title="Elimina voce" class="text-slate-300 hover:text-red-500 p-1 transition">
+                                    🗑️
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                    // Lista date e storico di ciascuna singola attività (Partono nascoste)
+                    activitiesHTML += `
+                        <div class="border-t border-slate-200/60">
+                            <button onclick="toggleAccordion('act-${roomIdx}-${actIdx}')" 
+                                    class="w-full text-left px-4 py-3 bg-white hover:bg-slate-100/50 flex items-center justify-between transition">
+                                <span class="text-sm font-semibold text-slate-700">🔹 ${action}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs bg-slate-200/70 text-slate-600 px-2 py-0.5 rounded-full font-medium">${logs.length}</span>
+                                    <span id="icon-act-${roomIdx}-${actIdx}" class="text-xs text-slate-400 transition-transform inline-block">▶</span>
+                                </div>
+                            </button>
+                            <div id="act-${roomIdx}-${actIdx}" class="hidden px-4 py-2 bg-slate-50/50 space-y-1">
+                                ${logsHTML}
+                            </div>
                         </div>
-                        <p class="font-bold text-slate-800 text-sm pt-0.5">${task.action}</p>
-                        ${task.notes ? `<p class="text-xs text-slate-500 italic">" ${task.notes} "</p>` : ''}
-                    </div>
-                    <button onclick="deleteTask(${index})" title="Elimina voce" class="text-slate-300 hover:text-red-500 p-2 transition">
-                        🗑️
+                    `;
+                });
+
+                // Lista attività di ciascuna stanza (Partono nascoste)
+                roomCard.innerHTML = `
+                    <button onclick="toggleAccordion('room-${roomIdx}')" 
+                            class="w-full text-left px-5 py-4 bg-slate-100/70 hover:bg-slate-200/50 flex items-center justify-between transition">
+                        <span class="font-bold text-slate-800 text-sm sm:text-base">${room}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">${totalRoomLogs} registrazioni</span>
+                            <span id="icon-room-${roomIdx}" class="text-xs text-slate-400 transition-transform inline-block">▶</span>
+                        </div>
                     </button>
+                    <div id="room-${roomIdx}" class="hidden">
+                        ${activitiesHTML}
+                    </div>
                 `;
-                taskList.appendChild(card);
+
+                historyContainer.appendChild(roomCard);
             });
         }
 
-        // Aggiungi nuova attività
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                if (icon) icon.style.transform = 'rotate(90deg)';
+            } else {
+                el.classList.add('hidden');
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
         taskForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -257,6 +333,7 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
             }
 
             const newTask = {
+                id: Date.now().toString(),
                 room: roomSelect.value,
                 action: actionSelect.value,
                 notes: notesInput.value.trim(),
@@ -271,17 +348,17 @@ A    <meta name="viewport" content="width=device-width, initial-scale=1.0">
             actionSelect.innerHTML = '<option value="">-- Prima seleziona un ambiente --</option>';
         });
 
-        function deleteTask(index) {
-            tasks.splice(index, 1);
+        function deleteSingleLog(id) {
+            tasks = tasks.filter(t => t.id !== id);
             saveAndRender();
         }
 
         function saveAndRender() {
-            localStorage.setItem('home_history', JSON.stringify(tasks));
-            renderTasks();
+            localStorage.setItem('home_history_v4', JSON.stringify(tasks));
+            renderHistory();
         }
 
-        renderTasks();
+        renderHistory();
     </script>
 </body>
 </html>
