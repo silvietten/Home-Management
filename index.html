@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Tracker - Design & Manutenzione</title>
+    <title>HOME - Gestione Casa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -18,8 +18,8 @@
              alt="Casa moderna" class="w-full h-full object-cover brightness-90">
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent flex flex-col justify-end p-6 sm:p-8">
             <span class="text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1">Interior & Maintenance</span>
-            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">Home Tracker</h1>
-            <p class="text-xs sm:text-sm text-slate-200 mt-1">La cura e la bellezza dei tuoi spazi, sempre organizzate.</p>
+            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">HOME</h1>
+            <p class="text-xs sm:text-sm text-slate-200 mt-1">Ti aiuto nella gestione della casa</p>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ambiente</label>
                     <select id="task-room" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                        <option value="🛏️ Camera da letto">🛏️ Camera da letto</option>
+                        <option value="🛏️ Camera matrimoniale">🛏️ Camera matrimoniale</option>
                         <option value="🖥️ Studio">🖥️ Studio</option>
                         <option value="🍳 Cucina">🍳 Cucina</option>
                         <option value="🛋️ Salotto">🛋️ Salotto</option>
@@ -78,10 +78,13 @@
 
     <script>
         const roomTemplates = {
-            "🛏️ Camera da letto": [
-                "Cambio lenzuola e federe",
-                "Spolverare mobili",
+            "🛏️ Camera matrimoniale": [
+                "Girare materasso",
                 "Lavaggio tende",
+                "Pulizia sotto il letto",
+                "Pulizia vetri",
+                "Pulizia sopra armadio",
+                "Pulizia interno ante armadio",
                 "Altro..."
             ],
             "🖥️ Studio": [
@@ -137,7 +140,7 @@
             ]
         };
 
-        let tasks = JSON.parse(localStorage.getItem('home_tracker_design')) || [];
+        let tasks = JSON.parse(localStorage.getItem('home_tracker_design_v2')) || [];
 
         const form = document.getElementById('task-form');
         const taskRoomSelect = document.getElementById('task-room');
@@ -178,7 +181,7 @@
         updateTemplates();
 
         function saveAndRender() {
-            localStorage.setItem('home_tracker_design', JSON.stringify(tasks));
+            localStorage.setItem('home_tracker_design_v2', JSON.stringify(tasks));
             renderTasks();
         }
 
@@ -194,4 +197,81 @@
             }
 
             const grouped = tasks.reduce((acc, task, index) => {
-                const room = task.room || '🏡 Altro / Generale
+                const room = task.room || '🏡 Altro / Generale';
+                if (!acc[room]) acc[room] = [];
+                acc[room].push({ ...task, originalIndex: index });
+                return acc;
+            }, {});
+
+            for (const [room, roomTasks] of Object.entries(grouped)) {
+                const roomContainer = document.createElement('div');
+                roomContainer.className = 'bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden';
+
+                let tasksHTML = '';
+                roomTasks.forEach(task => {
+                    const lastDate = task.lastDone ? new Date(task.lastDone).toLocaleDateString('it-IT') : 'Mai fatta';
+                    
+                    tasksHTML += `
+                        <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-50 last:border-none hover:bg-slate-50/60 transition">
+                            <div>
+                                <h4 class="font-semibold text-slate-800 text-sm sm:text-base">${task.name}</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">Ultima volta: <span class="font-medium text-slate-600">${lastDate}</span></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="completeTask(${task.originalIndex})" class="bg-emerald-50 text-emerald-600 border border-emerald-200/60 text-xs font-semibold px-3.5 py-2 rounded-xl hover:bg-emerald-100 transition shadow-sm">
+                                    ✓ Fatto oggi
+                                </button>
+                                <button onclick="deleteTask(${task.originalIndex})" class="text-slate-300 hover:text-rose-500 p-2 rounded-xl transition" title="Elimina">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                roomContainer.innerHTML = `
+                    <div class="bg-slate-50/80 px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-bold text-slate-700 text-xs sm:text-sm tracking-wider uppercase">${room}</h3>
+                        <span class="text-xs bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full font-semibold shadow-xs">${roomTasks.length}</span>
+                    </div>
+                    <div>${tasksHTML}</div>
+                `;
+
+                taskList.appendChild(roomContainer);
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let taskName = taskTemplateSelect.value;
+            if (taskName === 'Altro...') {
+                taskName = customTaskInput.value.trim();
+            }
+
+            tasks.push({
+                name: taskName,
+                room: taskRoomSelect.value,
+                lastDone: null
+            });
+
+            customTaskInput.value = '';
+            updateTemplates();
+            saveAndRender();
+        });
+
+        window.completeTask = function(index) {
+            tasks[index].lastDone = new Date().toISOString();
+            saveAndRender();
+        }
+
+        window.deleteTask = function(index) {
+            if (confirm('Vuoi davvero eliminare questa attività?')) {
+                tasks.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
+        renderTasks();
+    </script>
+</body>
+</html>
