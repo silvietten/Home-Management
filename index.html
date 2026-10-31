@@ -14,67 +14,24 @@
 <body class="bg-[#F8F9FA] text-slate-800 pb-16 font-helvetica">
 
     <!-- Copertina stile rivista di design -->
-    <div class="relative w-full h-80 sm:h-96 overflow-hidden shadow-md">
+    <div class="relative w-full h-72 sm:h-80 overflow-hidden shadow-md">
         <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80" 
              alt="Interno casa moderna" class="w-full h-full object-cover">
         
         <div class="absolute inset-0 bg-slate-900/40 flex flex-col items-center justify-center text-center p-6 sm:p-8">
-            <span class="text-base sm:text-xl uppercase tracking-widest text-emerald-300 italic mb-2">
+            <span class="text-xs sm:text-sm uppercase tracking-widest text-emerald-300 italic mb-2">
                 INTERIOR & MAINTENANCE
             </span>
-            <!-- Titolo principale ingrandito (x2) -->
-            <h1 class="text-7xl sm:text-9xl font-bold text-white tracking-tight mb-2">
+            <h1 class="text-5xl sm:text-7xl font-bold text-white tracking-tight mb-2">
                 HOME
             </h1>
-            <!-- Sottotitolo ingrandito (x2) -->
-            <p class="text-2xl sm:text-4xl text-slate-100 font-normal">
+            <p class="text-base sm:text-xl text-slate-100 font-normal">
                 Ti aiuto nella gestione della casa
             </p>
         </div>
     </div>
 
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
         
         <!-- Form per aggiungere un'attività -->
-        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 sm:p-8 mb-8">
-            <!-- Titolo della sezione ingrandito (x2) -->
-            <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                <span class="w-4 h-4 rounded-full bg-emerald-500"></span> Registra Attività Svolta
-            </h2>
-            
-            <form id="task-form" class="space-y-6">
-                <!-- Selezione Stanza / Ambiente -->
-                <div>
-                    <!-- Etichetta ingrandita del doppio (text-xs -> text-base) -->
-                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Ambiente</label>
-                    <!-- Menu a tendina ingrandito del doppio (text-sm -> text-xl, py-3 -> py-5, px-4 -> px-6) -->
-                    <select id="task-room" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-6 py-5 text-xl font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 transition">
-                        <option value="">-- Seleziona Ambiente --</option>
-                        <option value="🛏️ Camera matrimoniale">🛏️ Camera matrimoniale</option>
-                        <option value="🖥️ Studio">🖥️ Studio</option>
-                        <option value="🍳 Cucina">🍳 Cucina</option>
-                        <option value="🛋️ Salotto">🛋️ Salotto</option>
-                        <option value="🛌 Camera ospiti">🛌 Camera ospiti</option>
-                        <option value="🛁 Bagno grande">🛁 Bagno grande</option>
-                        <option value="🧼 Bagno ospiti">🧼 Bagno ospiti</option>
-                        <option value="🪴 Terrazza grande">🪴 Terrazza grande</option>
-                        <option value="🌿 Terrazzino">🌿 Terrazzino</option>
-                        <option value="📦 Ripostiglio / Lavanderia">📦 Ripostiglio / Lavanderia</option>
-                        <option value="🚗 Garage">🚗 Garage</option>
-                    </select>
-                </div>
-
-                <!-- Menu a tendina secondario per le attività -->
-                <div>
-                    <!-- Etichetta ingrandita del doppio -->
-                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Attività Svolta</label>
-                    <!-- Menu a tendina secondario ingrandito del doppio -->
-                    <select id="task-action" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-6 py-5 text-xl font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 transition disabled:opacity-50" disabled>
-                        <option value="">-- Prima seleziona un ambiente --</option>
-                    </select>
-                </div>
-
-                <!-- Campo libero facoltativo per note aggiuntive -->
-                <div>
-                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Note aggiuntive (Opz
-                        
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 mb-8">
