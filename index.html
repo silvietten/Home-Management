@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Tracker - Pulizie per Ambienti</title>
+    <title>Home Tracker - Design & Manutenzione</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans pb-12">
-    <div class="max-w-xl mx-auto p-4 sm:p-6">
-        
-        <!-- Intestazione -->
-        <header class="mb-6 text-center">
-            <h1 class="text-3xl font-extrabold text-gray-800">🏠 Home Tracker</h1>
-            <p class="text-sm text-gray-500 mt-1">Gestisci pulizie e manutenzioni per ogni ambiente</p>
-        </header>
+<body class="bg-[#F8F9FA] text-slate-800 pb-16">
 
+    <!-- Copertina stile rivista di design -->
+    <div class="relative w-full h-56 sm:h-72 overflow-hidden shadow-md">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" 
+             alt="Casa moderna" class="w-full h-full object-cover brightness-90">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent flex flex-col justify-end p-6 sm:p-8">
+            <span class="text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1">Interior & Maintenance</span>
+            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">Home Tracker</h1>
+            <p class="text-xs sm:text-sm text-slate-200 mt-1">La cura e la bellezza dei tuoi spazi, sempre organizzate.</p>
+        </div>
+    </div>
+
+    <div class="max-w-xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
+        
         <!-- Form per aggiungere un'attività -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-            <h2 class="text-lg font-bold text-gray-700 mb-3">Nuova attività</h2>
-            <form id="task-form" class="space-y-3">
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 mb-8">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aggiungi Intervento
+            </h2>
+            
+            <form id="task-form" class="space-y-4">
                 <!-- Selezione Stanza -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Seleziona Ambiente</label>
-                    <select id="task-room" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ambiente</label>
+                    <select id="task-room" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                         <option value="🛏️ Camera da letto">🛏️ Camera da letto</option>
                         <option value="🖥️ Studio">🖥️ Studio</option>
                         <option value="🍳 Cucina">🍳 Cucina</option>
@@ -38,12 +51,147 @@
 
                 <!-- Selezione Attività Predefinita -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Seleziona Attività</label>
-                    <select id="task-template" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <!-- Verrà popolato dinamicamente in base alla stanza -->
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Attività / Lavoro</label>
+                    <select id="task-template" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                        <!-- Popolato via JS -->
                     </select>
                 </div>
 
-                <!-- Campo personalizzato (appare se selezioni "Altro...") -->
+                <!-- Campo personalizzato (apparirà se si seleziona Altro) -->
                 <div id="custom-task-container" class="hidden">
-                    <label class="block text-xs font-semibold
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Specifica personalizzata</label>
+                    <input type="text" id="custom-task-name" placeholder="Es. Pulizia profonda lampadari" 
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                </div>
+                
+                <button type="submit" class="w-full bg-slate-900 text-white font-semibold py-3.5 rounded-2xl text-sm hover:bg-emerald-600 transition shadow-lg shadow-slate-900/10 mt-2">
+                    Registra nella lista
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista delle attività raggruppate per ambiente -->
+        <div id="task-list" class="space-y-6">
+            <!-- Verrà popolato da JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const roomTemplates = {
+            "🛏️ Camera da letto": [
+                "Cambio lenzuola e federe",
+                "Spolverare mobili",
+                "Lavaggio tende",
+                "Altro..."
+            ],
+            "🖥️ Studio": [
+                "Spolverare scrivania e libreria",
+                "Pulizia monitor e tastiera",
+                "Riordino documenti",
+                "Altro..."
+            ],
+            "🍳 Cucina": [
+                "Pulizia filtri cappa",
+                "Sbrinare frigorifero",
+                "Pulizia forno",
+                "Lavaggio filtri lavastoviglie",
+                "Altro..."
+            ],
+            "🛋️ Salotto": [
+                "Spolverare mobili e TV",
+                "Aspirare divano",
+                "Pulizia tappeti",
+                "Altro..."
+            ],
+            "🛌 Camera ospiti": [
+                "Cambio lenzuola",
+                "Arieggiare e spolverare",
+                "Altro..."
+            ],
+            "🛁 Bagno grande": [
+                "Pulizia box doccia e decalcificazione",
+                "Pulizia sanitari",
+                "Lavaggio tappeti e cambio asciugamani",
+                "Altro..."
+            ],
+            "🧼 Bagno ospiti": [
+                "Pulizia sanitari e lavabo",
+                "Cambio asciugamani",
+                "Altro..."
+            ],
+            "🪴 Terrazza grande": [
+                "Lavaggio pavimento",
+                "Cura piante",
+                "Pulizia vetri parapetto",
+                "Altro..."
+            ],
+            "🌿 Terrazza piccola": [
+                "Lavaggio pavimento",
+                "Cura piante",
+                "Altro..."
+            ],
+            "🏡 Altro / Generale": [
+                "Controllo caldaia",
+                "Controllo condizionatori",
+                "Altro..."
+            ]
+        };
+
+        let tasks = JSON.parse(localStorage.getItem('home_tracker_design')) || [];
+
+        const form = document.getElementById('task-form');
+        const taskRoomSelect = document.getElementById('task-room');
+        const taskTemplateSelect = document.getElementById('task-template');
+        const customTaskContainer = document.getElementById('custom-task-container');
+        const customTaskInput = document.getElementById('custom-task-name');
+        const taskList = document.getElementById('task-list');
+
+        function updateTemplates() {
+            const selectedRoom = taskRoomSelect.value;
+            const templates = roomTemplates[selectedRoom] || ["Altro..."];
+            
+            taskTemplateSelect.innerHTML = '';
+            templates.forEach(tpl => {
+                const opt = document.createElement('option');
+                opt.value = tpl;
+                opt.textContent = tpl;
+                taskTemplateSelect.appendChild(opt);
+            });
+
+            checkCustomTask();
+        }
+
+        function checkCustomTask() {
+            if (taskTemplateSelect.value === 'Altro...') {
+                customTaskContainer.classList.remove('hidden');
+                customTaskInput.required = true;
+            } else {
+                customTaskContainer.classList.add('hidden');
+                customTaskInput.required = false;
+                customTaskInput.value = '';
+            }
+        }
+
+        taskRoomSelect.addEventListener('change', updateTemplates);
+        taskTemplateSelect.addEventListener('change', checkCustomTask);
+
+        updateTemplates();
+
+        function saveAndRender() {
+            localStorage.setItem('home_tracker_design', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+                        <p class="text-slate-400 text-sm">Nessuna attività registrata. Scegli stanza e attività qui sopra! ✨</p>
+                    </div>`;
+                return;
+            }
+
+            const grouped = tasks.reduce((acc, task, index) => {
+                const room = task.room || '🏡 Altro / Generale
