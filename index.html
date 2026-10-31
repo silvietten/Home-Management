@@ -14,36 +14,41 @@
 <body class="bg-[#F8F9FA] text-slate-800 pb-16 font-helvetica">
 
     <!-- Copertina stile rivista di design -->
-    <div class="relative w-full h-64 sm:h-80 overflow-hidden shadow-md">
+    <div class="relative w-full h-80 sm:h-96 overflow-hidden shadow-md">
         <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80" 
              alt="Interno casa moderna" class="w-full h-full object-cover">
         
         <div class="absolute inset-0 bg-slate-900/40 flex flex-col items-center justify-center text-center p-6 sm:p-8">
-            <span class="text-xs sm:text-sm uppercase tracking-widest text-emerald-300 italic mb-2">
+            <span class="text-base sm:text-xl uppercase tracking-widest text-emerald-300 italic mb-2">
                 INTERIOR & MAINTENANCE
             </span>
-            <h1 class="text-4xl sm:text-6xl font-bold text-white tracking-tight mb-2">
+            <!-- Titolo principale ingrandito (x2) -->
+            <h1 class="text-7xl sm:text-9xl font-bold text-white tracking-tight mb-2">
                 HOME
             </h1>
-            <p class="text-sm sm:text-lg text-slate-100 font-normal">
+            <!-- Sottotitolo ingrandito (x2) -->
+            <p class="text-2xl sm:text-4xl text-slate-100 font-normal">
                 Ti aiuto nella gestione della casa
             </p>
         </div>
     </div>
 
-    <div class="max-w-xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 -mt-6 relative z-10">
         
         <!-- Form per aggiungere un'attività -->
-        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 mb-8">
-            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Registra Attività Svolta
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6 sm:p-8 mb-8">
+            <!-- Titolo della sezione ingrandito (x2) -->
+            <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="w-4 h-4 rounded-full bg-emerald-500"></span> Registra Attività Svolta
             </h2>
             
-            <form id="task-form" class="space-y-4">
+            <form id="task-form" class="space-y-6">
                 <!-- Selezione Stanza / Ambiente -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Ambiente</label>
-                    <select id="task-room" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    <!-- Etichetta ingrandita del doppio (text-xs -> text-base) -->
+                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Ambiente</label>
+                    <!-- Menu a tendina ingrandito del doppio (text-sm -> text-xl, py-3 -> py-5, px-4 -> px-6) -->
+                    <select id="task-room" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-6 py-5 text-xl font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 transition">
                         <option value="">-- Seleziona Ambiente --</option>
                         <option value="🛏️ Camera matrimoniale">🛏️ Camera matrimoniale</option>
                         <option value="🖥️ Studio">🖥️ Studio</option>
@@ -61,228 +66,15 @@
 
                 <!-- Menu a tendina secondario per le attività -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Attività Svolta</label>
-                    <select id="task-action" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition disabled:opacity-50" disabled>
+                    <!-- Etichetta ingrandita del doppio -->
+                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Attività Svolta</label>
+                    <!-- Menu a tendina secondario ingrandito del doppio -->
+                    <select id="task-action" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-6 py-5 text-xl font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 transition disabled:opacity-50" disabled>
                         <option value="">-- Prima seleziona un ambiente --</option>
                     </select>
                 </div>
 
                 <!-- Campo libero facoltativo per note aggiuntive -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Note aggiuntive (Opzionale)</label>
-                    <input type="text" id="task-notes" placeholder="Es. Usato prodotto anticalcare nuovo" 
-                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
-                </div>
-
-                <!-- Bottone Invio -->
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-emerald-600/30 transition transform active:scale-95 mt-2">
-                    Registra con data di oggi
-                </button>
-            </form>
-        </div>
-
-        <!-- Registro delle attività svolte -->
-        <div class="space-y-4">
-            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Storico Attività Svolte</h2>
-            <div id="task-list" class="space-y-3">
-                <!-- Vengono inserite qui dinamicamente -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Mappatura delle attività per ciascun ambiente
-        const roomActivities = {
-            "🛏️ Camera matrimoniale": [
-                "Cambio lenzuola",
-                "Pulizia approfondita materasso",
-                "Spolveratura armadi e superfici",
-                "Lavaggio vetri/finestre",
-                "Aspirapolvere e lavaggio pavimento"
-            ],
-            "🖥️ Studio": [
-                "Pulizia scrivania e monitor",
-                "Ordinamento documenti",
-                "Spolveratura libreria",
-                "Aspirapolvere e lavaggio pavimento"
-            ],
-            "🍳 Cucina": [
-                "Pulizia e sgrassaggio forno",
-                "Pulizia microonde",
-                "Decalcinazione macchina caffè",
-                "Pulizia e riordino frigorifero",
-                "Pulizia cappa e filtri",
-                "Lavaggio approfondito piani e lavello"
-            ],
-            "🛋️ Salotto": [
-                "Pulizia e aspirazione divano",
-                "Lavaggio tende",
-                "Pulizia TV e mobile",
-                "Aspirapolvere e lavaggio pavimento"
-            ],
-            "🛌 Camera ospiti": [
-                "Cambio lenzuola",
-                "Spolveratura generale",
-                "Aerazione stanza e aspirapolvere"
-            ],
-            "🛁 Bagno grande": [
-                "Sanificazione sanitari e doccia/vasca",
-                "Pulizia vetri box doccia",
-                "Decalcinazione rubinetterie",
-                "Cambio asciugamani e tappeti",
-                "Lavaggio piastrelle e pavimento"
-            ],
-            "🧼 Bagno ospiti": [
-                "Sanificazione sanitari",
-                "Pulizia specchio e lavabo",
-                "Cambio asciugamani",
-                "Lavaggio pavimento"
-            ],
-            "🪴 Terrazza grande": [
-                "Pulizia pavimento ed esterni",
-                "Cura e annaffiatura piante",
-                "Pulizia arredi da esterno",
-                "Pulizia scarichi e grondaie"
-            ],
-            "🌿 Terrazzino": [
-                "Spazzata e lavaggio pavimento",
-                "Cura piante",
-                "Pulizia parapetto"
-            ],
-            "📦 Ripostiglio / Lavanderia": [
-                "Pulizia filtro lavatrice",
-                "Pulizia filtro asciugatrice",
-                "Riordino detersivi e scorte",
-                "Pulizia scaffali"
-            ],
-            "🚗 Garage": [
-                "Spazzata pavimento",
-                "Riordino attrezzi",
-                "Controllo e pulizia scaffalature"
-            ]
-        };
-
-        const roomSelect = document.getElementById('task-room');
-        const actionSelect = document.getElementById('task-action');
-        const notesInput = document.getElementById('task-notes');
-        const taskForm = document.getElementById('task-form');
-        const taskList = document.getElementById('task-list');
-
-        let tasks = JSON.parse(localStorage.getItem('home_history')) || [];
-
-        // Cambia le opzioni del secondo menu a tendina in base alla stanza scelta
-        roomSelect.addEventListener('change', () => {
-            const selectedRoom = roomSelect.value;
-            actionSelect.innerHTML = '';
-
-            if (selectedRoom && roomActivities[selectedRoom]) {
-                actionSelect.disabled = false;
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = '-- Seleziona attività --';
-                actionSelect.appendChild(defaultOption);
-
-                roomActivities[selectedRoom].forEach(act => {
-                    const opt = document.createElement('option');
-                    opt.value = act;
-                    opt.textContent = act;
-                    actionSelect.appendChild(opt);
-                });
-            } else {
-                actionSelect.disabled = true;
-                const opt = document.createElement('option');
-                opt.value = '';
-                opt.textContent = '-- Prima seleziona un ambiente --';
-                actionSelect.appendChild(opt);
-            }
-        });
-
-        // Formattazione data corrente + ora
-        function getCurrentFormattedDate() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            const timeStr = now.toLocaleTimeString('it-IT', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            return `${dateStr} alle ${timeStr}`;
-        }
-
-        // Renderizza la lista
-        function renderTasks() {
-            taskList.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                taskList.innerHTML = `
-                    <div class="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
-                        <p class="text-slate-400 text-sm">Nessuna attività registrata nello storico.</p>
-                    </div>`;
-                return;
-            }
-
-            tasks.forEach((task, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between transition hover:shadow-md';
-                
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                ${task.room}
-                            </span>
-                            <span class="text-xs text-slate-400">📅 ${task.timestamp}</span>
-                        </div>
-                        <p class="font-bold text-slate-800 text-sm pt-0.5">${task.action}</p>
-                        ${task.notes ? `<p class="text-xs text-slate-500 italic">" ${task.notes} "</p>` : ''}
-                    </div>
-                    <button onclick="deleteTask(${index})" title="Elimina voce" class="text-slate-300 hover:text-red-500 p-2 transition">
-                        🗑️
-                    </button>
-                `;
-                taskList.appendChild(card);
-            });
-        }
-
-        // Aggiungi nuova attività
-        taskForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            if (!roomSelect.value || !actionSelect.value) {
-                alert('Seleziona sia l\'ambiente che l\'attività!');
-                return;
-            }
-
-            const newTask = {
-                room: roomSelect.value,
-                action: actionSelect.value,
-                notes: notesInput.value.trim(),
-                timestamp: getCurrentFormattedDate()
-            };
-
-            tasks.unshift(newTask); // Aggiunge l'ultimo intervento in cima
-            saveAndRender();
-
-            // Reset form
-            taskForm.reset();
-            actionSelect.disabled = true;
-            actionSelect.innerHTML = '<option value="">-- Prima seleziona un ambiente --</option>';
-        });
-
-        function deleteTask(index) {
-            tasks.splice(index, 1);
-            saveAndRender();
-        }
-
-        function saveAndRender() {
-            localStorage.setItem('home_history', JSON.stringify(tasks));
-            renderTasks();
-        }
-
-        renderTasks();
-    </script>
-</body>
-</html>
+                    <label class="block text-base font-bold text-slate-500 uppercase tracking-wider mb-2">Note aggiuntive (Opz
+                        
