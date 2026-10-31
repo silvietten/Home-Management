@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Tracker - Pulizie e Manutenzioni</title>
+    <!-- Tailwind CSS per uno stile pulito e moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-6">
+    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <hh1 class="text-2xl font-bold text-gray-800 mb-4">🏠 Home Tracker</h1>
+        
+        <!-- Form per aggiungere una nuova attività -->
+        <form id="task-form" class="flex gap-2 mb-6">
+            <input type="text" id="task-name" placeholder="Nome attività (es. Cambio filtri)" required 
+                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Aggiungi</button>
+        </form>
+
+        <!-- Lista delle attività -->
+        <div id="task-list" class="space-y-3">
+            <!-- Gli elementi verranno inseriti qui via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Carica le attività dal localStorage o usa un array vuoto
+        let tasks = JSON.parse(localStorage.getItem('home_tasks')) || [];
+
+        const form = document.getElementById('task-form');
+        const taskNameInput = document.getElementById('task-name');
+        const taskList = document.getElementById('task-list');
+
+        function saveAndRender() {
+            localStorage.setItem('home_tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<p class="text-gray-500 text-center py-4">Nessuna attività registrata.</p>';
+                return;
+            }
+
+            tasks.forEach((task, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200';
+                
+                const lastDate = task.lastDone ? new Date(task.lastDone).toLocaleDateString('it-IT') : 'Mai fatta';
+
+                item.innerHTML = `
+                    <div>
+                        <h3 class="font-semibold text-gray-800">${task.name}</h3>
+                        <p class="text-sm text-gray-500">Ultima volta: <span class="font-medium text-gray-700">${lastDate}</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="completeTask(${index})" class="bg-green-500 text-white text-sm px-3 py-1.5 rounded-md hover:bg-green-600 transition">Fatto oggi</button>
+                        <button onclick="deleteTask(${index})" class="bg-red-100 text-red-600 text-sm px-2.5 py-1.5 rounded-md hover:bg-red-200 transition">Elimina</button>
+                    </div>
+                `;
+                taskList.appendChild(item);
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            tasks.push({
+                name: taskNameInput.value,
+                lastDone: null
+            });
+            taskNameInput.value = '';
+            saveAndRender();
+        });
+
+        window.completeTask = function(index) {
+            tasks[index].lastDone = new Date().toISOString();
+            saveAndRender();
+        }
+
+        window.deleteTask = function(index) {
+            tasks.splice(index, 1);
+            saveAndRender();
+        }
+
+        // Primo avvio
+        renderTasks();
+    </script>
+</body>
+</html>
