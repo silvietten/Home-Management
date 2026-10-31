@@ -3,71 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Tracker - Pulizie e Manutenzioni</title>
-    <!-- Tailwind CSS per uno stile pulito e moderno -->
+    <title>Home Tracker - Pulizie per Ambienti</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans p-6">
-    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-        <hh1 class="text-2xl font-bold text-gray-800 mb-4">🏠 Home Tracker</h1>
+<body class="bg-gray-50 font-sans pb-12">
+    <div class="max-w-xl mx-auto p-4 sm:p-6">
         
-        <!-- Form per aggiungere una nuova attività -->
-        <form id="task-form" class="flex gap-2 mb-6">
-            <input type="text" id="task-name" placeholder="Nome attività (es. Cambio filtri)" required 
-                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Aggiungi</button>
-        </form>
+        <!-- Intestazione -->
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-extrabold text-gray-800">🏠 Home Tracker</h1>
+            <p class="text-sm text-gray-500 mt-1">Gestisci pulizie e manutenzioni per ogni ambiente</p>
+        </header>
 
-        <!-- Lista delle attività -->
-        <div id="task-list" class="space-y-3">
-            <!-- Gli elementi verranno inseriti qui via JavaScript -->
+        <!-- Form per aggiungere un'attività -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+            <h2 class="text-lg font-bold text-gray-700 mb-3">Nuova attività</h2>
+            <form id="task-form" class="space-y-3">
+                <input type="text" id="task-name" placeholder="Nome attività (es. Lavaggio filtri, Pulizia forno)" required 
+                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                
+                <div class="flex gap-2">
+                    <select id="task-room" class="flex-1 border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Cucina">🍳 Cucina</option>
+                        <option value="Bagno">🚿 Bagno</option>
+                        <option value="Camera">🛏️ Camera da letto</option>
+                        <option value="Soggiorno">🛋️ Soggiorno</option>
+                        <option value="Generale">🏡 Casa in generale / Altro</option>
+                    </select>
+                    
+                    <button type="submit" class="bg-blue-600 text-white font-medium px-5 py-2.5 rounded-xl text-sm hover:bg-blue-700 transition shadow-sm">
+                        Aggiungi
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista delle attività raggruppate per ambiente -->
+        <div id="task-list" class="space-y-6">
+            <!-- Verrà popolato da JavaScript -->
         </div>
     </div>
 
     <script>
-        // Carica le attività dal localStorage o usa un array vuoto
-        let tasks = JSON.parse(localStorage.getItem('home_tasks')) || [];
+        let tasks = JSON.parse(localStorage.getItem('home_tasks_rooms')) || [];
 
         const form = document.getElementById('task-form');
         const taskNameInput = document.getElementById('task-name');
+        const taskRoomSelect = document.getElementById('task-room');
         const taskList = document.getElementById('task-list');
 
         function saveAndRender() {
-            localStorage.setItem('home_tasks', JSON.stringify(tasks));
+            localStorage.setItem('home_tasks_rooms', JSON.stringify(tasks));
             renderTasks();
         }
 
         function renderTasks() {
             taskList.innerHTML = '';
+            
             if (tasks.length === 0) {
-                taskList.innerHTML = '<p class="text-gray-500 text-center py-4">Nessuna attività registrata.</p>';
+                taskList.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 p-6">
+                        <p class="text-gray-400 text-sm">Nessuna attività registrata. Inizia aggiungendone una qui sopra! 👆</p>
+                    </div>`;
                 return;
             }
 
-            tasks.forEach((task, index) => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200';
-                
-                const lastDate = task.lastDone ? new Date(task.lastDone).toLocaleDateString('it-IT') : 'Mai fatta';
+            // Raggruppa le attività per ambiente
+            const grouped = tasks.reduce((acc, task, index) => {
+                const room = task.room || 'Generale';
+                if (!acc[room]) acc[room] = [];
+                acc[room].push({ ...task, originalIndex: index });
+                return acc;
+            }, {});
 
-                item.innerHTML = `
-                    <div>
-                        <h3 class="font-semibold text-gray-800">${task.name}</h3>
-                        <p class="text-sm text-gray-500">Ultima volta: <span class="font-medium text-gray-700">${lastDate}</span></p>
+            // Crea le sezioni per ogni stanza
+            for (const [room, roomTasks] of Object.entries(grouped)) {
+                const roomContainer = document.createElement('div');
+                roomContainer.className = 'bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden';
+
+                let tasksHTML = '';
+                roomTasks.forEach(task => {
+                    const lastDate = task.lastDone ? new Date(task.lastDone).toLocaleDateString('it-IT') : 'Mai fatta';
+                    
+                    tasksHTML += `
+                        <div class="flex items-center justify-between p-4 border-b border-gray-100 last:border-none hover:bg-gray-50/50 transition">
+                            <div>
+                                <h4 class="font-semibold text-gray-800 text-sm sm:text-base">${task.name}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5">Ultima volta: <span class="font-medium text-gray-600">${lastDate}</span></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="completeTask(${task.originalIndex})" class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition">
+                                    ✓ Fatto oggi
+                                </button>
+                                <button onclick="deleteTask(${task.originalIndex})" class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg transition" title="Elimina">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                roomContainer.innerHTML = `
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-700 text-sm tracking-wide uppercase">${room}</h3>
+                        <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-medium">${roomTasks.length}</span>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="completeTask(${index})" class="bg-green-500 text-white text-sm px-3 py-1.5 rounded-md hover:bg-green-600 transition">Fatto oggi</button>
-                        <button onclick="deleteTask(${index})" class="bg-red-100 text-red-600 text-sm px-2.5 py-1.5 rounded-md hover:bg-red-200 transition">Elimina</button>
-                    </div>
+                    <div>${tasksHTML}</div>
                 `;
-                taskList.appendChild(item);
-            });
+
+                taskList.appendChild(roomContainer);
+            }
         }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             tasks.push({
-                name: taskNameInput.value,
+                name: taskNameInput.value.trim(),
+                room: taskRoomSelect.value,
                 lastDone: null
             });
             taskNameInput.value = '';
@@ -80,11 +132,12 @@
         }
 
         window.deleteTask = function(index) {
-            tasks.splice(index, 1);
-            saveAndRender();
+            if (confirm('Vuoi davvero eliminare questa attività?')) {
+                tasks.splice(index, 1);
+                saveAndRender();
+            }
         }
 
-        // Primo avvio
         renderTasks();
     </script>
 </body>
